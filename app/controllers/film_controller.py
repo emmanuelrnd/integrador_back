@@ -9,27 +9,27 @@ class UserController:
     """User controller class"""
 
     @classmethod
-    def get(cls, film_id):
-        """Get a film by id"""
-        film = User(film_id=film_id)
-        result = User.get(film)
+    def get(cls, user_id):
+        """Get a user by id"""
+        user = User(user_id=user_id)
+        result = User.get(user)
         if result is not None:
             return result.serialize(), 200
         else:
-            raise UserNotFound(f"User with id {film_id} not found")
+            raise UserNotFound(f"User with id {user_id} not found")
         
     @classmethod
     def get_all(cls):
         """Get all films"""
         film_objects = User.get_all()
         films = []
-        for film in film_objects:
-            films.append(film.serialize())
+        for user in film_objects:
+            films.append(user.serialize())
         return films, 200
     
     @classmethod
     def create(cls):
-        """Create a new film"""
+        """Create a new user"""
         data = request.json
         descripcion = """Se deben cumplir los siguientes requisitos:
     
@@ -78,13 +78,13 @@ class UserController:
                     else:
                         raise InvalidDataError(descripcion)
 
-        film = User(**data)
-        User.create(film)
+        user = User(**data)
+        User.create(user)
         return {'message': 'User created successfully'}, 201
 
     @classmethod
-    def update(cls, film_id):
-        """Update a film"""
+    def update(cls, user_id):
+        """Update a user"""
         descripcion = """Se deben cumplir los siguientes requisitos:
     
                     • El atributo title debe tener tres caracteres como mínimo.
@@ -134,19 +134,19 @@ class UserController:
         
 
                     
-        data['film_id'] = film_id
+        data['user_id'] = user_id
 
-        film = User(**data)
+        user = User(**data)
 
-        # TODO: Validate film exists
-        User.update(film)
+        # TODO: Validate user exists
+        User.update(user)
         return {'message': 'User updated successfully'}, 200
     
     @classmethod
-    def delete(cls, film_id):
-        """Delete a film"""
-        film = User(film_id=film_id)
+    def delete(cls, user_id):
+        """Delete a user"""
+        user = User(user_id=user_id)
 
-        # TODO: Validate film exists
-        User.delete(film)
+        # TODO: Validate user exists
+        User.delete(user)
         return {'message': 'User deleted successfully'}, 204
