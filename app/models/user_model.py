@@ -1,28 +1,22 @@
 from ..database import DatabaseConnection
 from app.models.exceptions import UserNotFound
 class User:
-    """Film model class"""
+    """user model class"""
 
-    def __init__(self, film_id = None, title = None, description = None, 
-                 release_year = None, language_id = None, 
-                 original_language_id = None, rental_duration = None,
+    def __init__(self, user_id = None, email = None, password = None, 
+                 nacimiento = None, usuario = None, 
+                 contraseña = None, foto = None,
                  rental_rate = None, length = None, replacement_cost = None,
                  rating = None, special_features = None, last_update = None):
         """Constructor method"""
-        self.film_id = film_id
-        self.title = title
-        self.description = description
-        self.release_year = release_year
-        self.language_id = language_id
-        self.original_language_id = original_language_id
-        self.rental_duration = rental_duration
-        self.rental_rate = rental_rate
-        self.length = length
-        self.replacement_cost = replacement_cost
-        self.rating = rating
-        self.special_features = special_features
-        self.last_update = last_update
-
+        self.user_id = user_id
+        self.email = email
+        self.password = password
+        self.nacimiento = nacimiento
+        self.usuario = usuario
+        self.contraseña = contraseña
+        self.foto = foto
+        
     def serialize(self):
         """Serialize object representation
         Returns:
@@ -40,35 +34,29 @@ class User:
         else:
             special_features = None
         return {
-            "film_id": self.film_id,
-            "title": self.title,
-            "description": self.description,
-            "release_year": self.release_year,
-            "language_id": self.language_id,
-            "original_language_id": self.original_language_id,
-            "rental_duration": self.rental_duration,
-            "rental_rate": int(self.rental_rate*100),
-            "length": self.length,
-            "replacement_cost": int(self.replacement_cost*100),
-            "rating": self.rating,
-            "special_features": special_features,
-            "last_update": str(self.last_update)
+            "user_id": self.user_id,
+            "email": self.email,
+            "password": self.password,
+            "nacimiento": self.nacimiento,
+            "usuario": self.usuario,
+            "contraseña": self.contraseña,
+            "foto": self.foto,
+            
         }
     
     @classmethod
-    def get(cls, film):
-        """Get a film by id
+    def get(cls, user):
+        """Get a user by id
         Args:
-            - film (Film): Film object with the id attribute
+            - user (user): user object with the id attribute
         Returns:
-            - Film: Film object
+            - user: user object
         """
 
-        query = """SELECT film_id, title, description, release_year,
-        language_id, original_language_id, rental_duration, rental_rate,
-        length, replacement_cost, rating, special_features, last_update 
-        FROM sakila.film WHERE film_id = %s"""
-        params = film.film_id,
+        query = """SELECT user_id, email, password, nacimiento,
+        usuario, contraseña, foto 
+        FROM integrador.user WHERE user_id = %s"""
+        params = user.user_id,
         result = DatabaseConnection.fetch_one(query, params=params)
 
         if result is not None:
@@ -77,67 +65,64 @@ class User:
     
     @classmethod
     def get_all(cls):
-        """Get all films
+        """Get all users
         Returns:
-            - list: List of Film objects
+            - list: List of user objects
         """
-        query = """SELECT film_id, title, description, release_year,
-        language_id, original_language_id, rental_duration, rental_rate,
-        length, replacement_cost, rating, special_features, last_update 
-        FROM sakila.film"""
+        query = """SELECT user_id, email, password, nacimiento,
+        usuario, contraseña, foto
+        FROM integrador.user"""
         results = DatabaseConnection.fetch_all(query)
 
-        films = []
+        users = []
         if results is not None:
             for result in results:
-                films.append(cls(*result))
-        return films
+                users.append(cls(*result))
+        return users
     
     @classmethod
-    def create(cls, film):
-        """Create a new film
+    def create(cls, user):
+        """Create a new user
         Args:
-            - film (Film): Film object
+            - user (user): user object
         """
-        query = """INSERT INTO sakila.film (title, description, release_year,
-        language_id, original_language_id, rental_duration, rental_rate,
-        length, replacement_cost, rating, special_features) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        query = """INSERT INTO integrador.user (email, password, nacimiento,
+        usuario, contraseña, foto) 
+        VALUES (%s, %s, %s, %s, %s, %s)"""
         
-        if film.special_features is not None:
-            special_features = ','.join(film.special_features)
+        if user.special_features is not None:
+            special_features = ','.join(user.special_features)
         else:
             special_features = None
-        params = film.title, film.description, film.release_year, \
-                 film.language_id, film.original_language_id, \
-                 film.rental_duration, film.rental_rate, film.length, \
-                 film.replacement_cost, film.rating, special_features
+        params = user.email, user.password, user.nacimiento, \
+                 user.usuario, user.contraseña, \
+                 user.foto, user.rental_rate, user.length, \
+                 user.replacement_cost, user.rating, special_features
         DatabaseConnection.execute_query(query, params=params)
 
     @classmethod
-    def exists(cls,film_id):
-        query = "SELECT * FROM sakila.film WHERE film_id = %s"
-        params = (film_id,)
+    def exists(cls,user_id):
+        query = "SELECT * FROM integrador.user WHERE user_id = %s"
+        params = (user_id,)
         resultado = DatabaseConnection.fetch_one(query,params=params)
         return resultado
     
     @classmethod
-    def update(cls, film):
-        """Update a film
+    def update(cls, user):
+        """Update a user
         Args:
-            - film (Film): Film object
+            - user (user): user object
         """
 
-        if not cls.exists(film.film_id):
-            raise UserNotFound(f"Film with id {film.film_id} not found")
+        if not cls.exists(user.user_id):
+            raise UserNotFound(f"user with id {user.user_id} not found")
         
-        allowed_columns = {'title', 'description', 'release_year',
-                           'language_id', 'original_language_id',
-                           'rental_duration', 'rental_rate', 'length',
-                           'replacement_cost', 'rating', 'special_features'}
+        allowed_columns = {'email', 'password', 'nacimiento',
+                           'usuario', 'contraseña',
+                           'foto'}
         query_parts = []
         params = []
-        for key, value in film.__dict__.items():
+        for key, value in user.__dict__.items():
             if key in allowed_columns and value is not None:
                 if key == 'special_features':
                     if len(value) == 0:
@@ -146,19 +131,19 @@ class User:
                         value = ','.join(value)
                 query_parts.append(f"{key} = %s")
                 params.append(value)
-        params.append(film.film_id)
+        params.append(user.user_id)
 
-        query = "UPDATE sakila.film SET " + ", ".join(query_parts) + " WHERE film_id = %s"
+        query = "UPDATE integrador.user SET " + ", ".join(query_parts) + " WHERE user_id = %s"
         DatabaseConnection.execute_query(query, params=params)
     
     @classmethod
-    def delete(cls, film):
-        """Delete a film
+    def delete(cls, user):
+        """Delete a user
         Args:
-            - film (User): Film object with the id attribute
+            - user (User): user object with the id attribute
         """
-        if not cls.exists(film.film_id):
-            raise UserNotFound(f"Film with id {film.film_id} not found")
-        query = "DELETE FROM sakila.film WHERE film_id = %s"
-        params = film.film_id,
+        if not cls.exists(user.user_id):
+            raise UserNotFound(f"user with id {user.user_id} not found")
+        query = "DELETE FROM integrador.user WHERE user_id = %s"
+        params = user.user_id,
         DatabaseConnection.execute_query(query, params=params)
